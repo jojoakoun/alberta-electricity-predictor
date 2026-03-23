@@ -105,7 +105,7 @@ class HistoricalLoader:
     📅 Convert raw timestamp string to pandas datetime in UTC.
     ✅ UTC is preferred — no daylight saving time (DST) issues.
     """
-    df["timestamp_utc"] = pd.to_datetime(df["Date_Begin_GMT"])
+    df["timestamp_utc"] = pd.to_datetime(df["Date_Begin_GMT"], utc=True)
     
     # 🗑️ Drop original column — replaced by timestamp_utc
     df = df.drop(columns=["Date_Begin_GMT"])
