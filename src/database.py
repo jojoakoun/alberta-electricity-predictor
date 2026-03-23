@@ -48,9 +48,13 @@ class DatabaseClient:
         price_actual         NUMERIC(10, 4),
         price_forecast       NUMERIC(10, 4),
 
-        -- ⚡ Demand and generation (MW)
+        -- ⚡ Demand — actual and forecast (MW)
         consumption_actual   NUMERIC(10, 4),
+        consumption_forecast NUMERIC(10, 4),
+
+        -- 🏭 Total generation (MW) — CSV only, NULL for API rows
         total_generation_mw  NUMERIC(10, 4),
+
 
         -- 📤 Exports (MW)
         export_to_bc         NUMERIC(10, 4),
@@ -87,13 +91,14 @@ class DatabaseClient:
     insert_sql = """
       INSERT INTO pool_prices (
         timestamp_utc, price_actual, price_forecast,
-        consumption_actual, total_generation_mw,
+        consumption_actual,consumption_forecast,
+        total_generation_mw,
         export_to_bc, export_to_mt, export_to_sk,
         import_from_bc, import_from_mt, import_from_sk,
         source
       ) VALUES (
         %s, %s, %s, %s, %s,
-        %s, %s, %s, %s, %s, %s,
+        %s, %s, %s, %s, %s, %s, %s,
         %s
       )
       ON CONFLICT (timestamp_utc) DO NOTHING;
@@ -106,6 +111,7 @@ class DatabaseClient:
         row.price_actual,
         row.price_forecast,
         row.consumption_actual,
+        getattr(row, "consumption_forecast", None),  # ⚠️ NULL for CSV rows
         row.total_generation_mw,
         row.export_to_bc,
         row.export_to_mt,
@@ -127,7 +133,34 @@ class DatabaseClient:
 
     print(f"🎉 Done — {row_count:,} rows inserted")
     return row_count
+  
+  def get_latest_timestamp(self) -> str:
+    """
+    📅 Get the latest timestamp in pool_prices.
+    Returns the next hour to fetch from the API.
+    """
+    print("📅 Checking latest timestamp in database...")
 
+    with self.connect() as conn:
+      with conn.cursor() as cursor:
+        cursor.execute("SELECT MAX(timestamp_utc) FROM pool_prices;")
+        latest = cursor.fetchone()[0]
+
+    if latest is None:
+      # 🗄️ Empty table — start from a default date
+      print("⚠️  No data found — starting from 2020-01-01")
+      return "2020-01-01"
+
+    # ➕ Add one hour to avoid re-fetching the last row
+    next_hour = latest + pd.Timedelta(hours=1)
+    next_date = next_hour.strftime("%Y-%m-%d")
+
+    print(f"✅ Latest timestamp : {latest}")
+    print(f"📅 Next fetch from  : {next_date}")
+
+    return next_date
+  
+  
 if __name__ == "__main__":
   print("🧪 Testing DatabaseClient...")
 
