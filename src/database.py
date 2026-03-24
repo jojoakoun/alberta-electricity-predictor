@@ -161,6 +161,113 @@ class DatabaseClient:
     return next_date
   
   
+  def create_features_table(self):
+    """🏗️ Create the features table if it doesn't exist yet."""
+    print("🏗️ Creating features table if not exists...")
+    
+    create_features = """
+      CREATE TABLE IF NOT EXISTS features (
+
+        -- ⏰ Timestamp — primary key, links to pool_prices
+        timestamp_utc        TIMESTAMP WITH TIME ZONE PRIMARY KEY,
+
+        -- 🎯 Target variable
+        price_actual         NUMERIC(10, 4),
+
+        -- 🔮 AESO forecast
+        price_forecast       NUMERIC(10, 4),
+
+        -- ⚡ Demand
+        consumption_actual   NUMERIC(10, 4),
+
+        -- 📅 Temporal features
+        hour_local           SMALLINT,
+        month                SMALLINT,
+        day_of_week          SMALLINT,
+        is_weekend           SMALLINT,
+
+        -- 📈 Lag features
+        price_lag_1h         NUMERIC(10, 4),
+        price_lag_2h         NUMERIC(10, 4),
+        price_lag_24h        NUMERIC(10, 4),
+        price_lag_168h       NUMERIC(10, 4),
+
+        -- 📊 Rolling averages
+        price_rolling_24h    NUMERIC(10, 4),
+        price_rolling_7d     NUMERIC(10, 4),
+        price_rolling_30d    NUMERIC(10, 4),
+
+        -- 🏭 Generation and trade (NULL for API rows)
+        total_generation_mw  NUMERIC(10, 4),
+        export_to_bc         NUMERIC(10, 4),
+        export_to_mt         NUMERIC(10, 4),
+        export_to_sk         NUMERIC(10, 4),
+        import_from_bc       NUMERIC(10, 4),
+        import_from_mt       NUMERIC(10, 4),
+        import_from_sk       NUMERIC(10, 4)
+      );
+    """
+    
+    with self.connect() as conn:
+      with conn.cursor() as cursor:
+        cursor.execute(create_features)
+      conn.commit()
+
+    print("✅ Features table ready")
+    
+  def insert_features(self, df: pd.DataFrame) -> int:
+    """
+    💾 Insert features DataFrame into the features table.
+    ⚠️  Skips duplicates — safe to run multiple times.
+    Returns the number of rows inserted.
+    """
+    print(f"💾 Inserting {len(df):,} feature rows...")
+    
+    insert_sql = """
+      INSERT INTO features (
+        timestamp_utc, price_actual, price_forecast,
+        consumption_actual,
+        hour_local, month, day_of_week, is_weekend,
+        price_lag_1h, price_lag_2h, price_lag_24h, price_lag_168h,
+        price_rolling_24h, price_rolling_7d,price_rolling_30d,
+        total_generation_mw,
+        export_to_bc, export_to_mt, export_to_sk,
+        import_from_bc, import_from_mt, import_from_sk
+      ) VALUES (
+        %s, %s, %s, %s,
+        %s, %s, %s, %s,
+        %s, %s, %s, %s,
+        %s, %s, %s, %s,
+        %s, %s, %s, %s, %s, %s
+      )
+      ON CONFLICT (timestamp_utc) DO NOTHING;
+    """
+
+    rows = [
+      (
+        row.Index,
+        row.price_actual, row.price_forecast,
+        row.consumption_actual,
+        row.hour_local, row.month, row.day_of_week, row.is_weekend,
+        row.price_lag_1h, row.price_lag_2h,
+        row.price_lag_24h, row.price_lag_168h,
+        row.price_rolling_24h, row.price_rolling_7d,
+        row.price_rolling_30d, row.total_generation_mw,
+        row.export_to_bc, row.export_to_mt, row.export_to_sk,
+        row.import_from_bc, row.import_from_mt, row.import_from_sk,
+      )
+      for row in df.itertuples()
+    ]
+
+    with self.connect() as conn:
+      with conn.cursor() as cursor:
+        cursor.executemany(insert_sql, rows)
+        row_count = cursor.rowcount
+      conn.commit()
+
+    print(f"🎉 Done — {row_count:,} feature rows inserted")
+    return row_count
+  
 if __name__ == "__main__":
   print("🧪 Testing DatabaseClient...")
 
