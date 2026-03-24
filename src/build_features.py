@@ -10,7 +10,7 @@ import pandas as pd
 import psycopg2
 import os
 from dotenv import load_dotenv
-from database import DatabaseClient
+from .database import DatabaseClient
 
 load_dotenv()
 

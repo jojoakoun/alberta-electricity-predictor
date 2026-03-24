@@ -268,6 +268,29 @@ class DatabaseClient:
     print(f"🎉 Done — {row_count:,} feature rows inserted")
     return row_count
   
+  def get_latest_feature_timestamp(self):
+    """
+    📅 Get the latest timestamp in features table.
+    Returns start date with 168h context for lag calculation.
+    """
+    print("📅 Checking latest timestamp in features...")
+
+    with self.connect() as conn:
+      with conn.cursor() as cursor:
+        cursor.execute("SELECT MAX(timestamp_utc) FROM features;")
+        latest = cursor.fetchone()[0]
+
+    if latest is None:
+      print("⚠️  No features found — building from scratch")
+      return None
+
+    # ⏪ Go back 168 hours for lag context
+    start_with_context = latest - pd.Timedelta(hours=168)
+    print(f"✅ Latest feature   : {latest}")
+    print(f"📅 Loading from     : {start_with_context} (168h context)")
+
+    return start_with_context
+  
 if __name__ == "__main__":
   print("🧪 Testing DatabaseClient...")
 
