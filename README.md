@@ -3,7 +3,7 @@
 > Predicting Alberta's hourly electricity prices to help families save money
 > on their variable-rate electricity bills.
 
-**Live app :** coming soon
+**Live app :** https://spectacular-compassion-production-9e0c.up.railway.app
 **Built by :** Joel-Hervé Akoun · Edmonton, Alberta
 
 ---
@@ -47,6 +47,18 @@ forecasts — but consistently misses the most critical spikes.
 
 ---
 
+## Features
+
+- 📊 **24-hour price forecast** — hourly predictions with confidence context
+- 🌡️ **Traffic light indicator** — 🟢 Normal / 🟡 Moderate / 🟠 High / 🔴 Spike
+- 📅 **Date picker** — browse any historical date back to 2020
+- 🏆 **Model vs AESO comparison** — see who was more accurate hour by hour
+- 🇬🇧 🇫🇷 **Bilingual** — full English and French support
+- 🔄 **Auto-refresh** — predictions update every 5 minutes
+- 📱 **Responsive** — works on mobile, tablet, and desktop
+
+---
+
 ## Architecture
 ```
 AESO CSV (historical) ──→
@@ -69,9 +81,11 @@ price_forecast >= 100$/MWh → XGBoost tuned  (spike hours — Optuna + spike we
 | Data | AESO Historical CSV + AESO REST API |
 | Database | PostgreSQL |
 | ML | XGBoost + Optuna hyperparameter tuning |
-| Backend | FastAPI (Python) |
-| Frontend | React + Recharts |
-| Deployment | Railway (backend + DB) + Vercel (frontend) |
+| Backend | FastAPI (Python 3.12) |
+| Frontend | React + Recharts + Tailwind CSS |
+| Fonts | Veneer (display) + Open Sans (body) |
+| i18n | Custom LanguageContext (EN / FR) |
+| Deployment | Railway (backend + DB + scheduler) + Railway (frontend) |
 
 ---
 
@@ -107,11 +121,11 @@ python main.py update   # fetch new data + rebuild features
 
 ## API Endpoints
 ```
-GET /health              → API status + model accuracy
+GET /health                  → API status + model accuracy
 GET /predict?date=YYYY-MM-DD → 24h predictions for a specific date
-GET /latest              → Latest 24h predictions
-GET /model/info          → Full model metadata and metrics
-GET /docs                → Interactive Swagger UI
+GET /latest                  → Latest 24h predictions
+GET /model/info              → Full model metadata and metrics
+GET /docs                    → Interactive Swagger UI
 ```
 
 ---
@@ -120,42 +134,50 @@ GET /docs                → Interactive Swagger UI
 ```
 alberta-electricity-predictor/
 │
-├── main.py                  # 🚀 Orchestrator — update pipeline
-├── Procfile                 # Railway deployment config
+├── main.py                    # 🚀 Orchestrator — update pipeline
+├── Procfile                   # Railway backend config
+├── .python-version            # Python 3.12 (XGBoost requirement)
 ├── requirements.txt
 │
-├── data/                    # Raw CSV (gitignored)
-├── models/                  # Trained models (gitignored)
-│   ├── xgboost_v1.pkl
-│   ├── xgboost_tuned.pkl
-│   ├── best_params.json
-│   └── metadata.json
+├── models/                    # Trained models
+│   ├── xgboost_v1.pkl         # Baseline model
+│   ├── xgboost_tuned.pkl      # Optuna-tuned spike specialist
+│   ├── best_params.json       # Optuna best parameters
+│   └── metadata.json          # Metrics and configuration
 │
 ├── notebooks/
-│   ├── eda.ipynb            # Exploratory Data Analysis
-│   └── model.ipynb          # Model training + evaluation
+│   ├── eda.ipynb              # Exploratory Data Analysis
+│   └── model.ipynb            # Model training + evaluation
 │
 ├── src/
-│   ├── fetch_aeso.py        # Load historical CSV
-│   ├── fetch_aeso_api.py    # Fetch real-time API
-│   ├── database.py          # PostgreSQL client
-│   ├── load_historical.py   # CSV → PostgreSQL
-│   ├── ingest_api.py        # API → PostgreSQL
-│   └── build_features.py    # Feature engineering
+│   ├── fetch_aeso.py          # Load historical CSV
+│   ├── fetch_aeso_api.py      # Fetch real-time API
+│   ├── database.py            # PostgreSQL client
+│   ├── load_historical.py     # CSV → PostgreSQL
+│   ├── ingest_api.py          # API → PostgreSQL
+│   └── build_features.py      # Feature engineering
 │
 └── app/
-    ├── backend/main.py      # FastAPI
-    └── frontend/            # React app
+    ├── backend/main.py        # FastAPI
+    └── frontend/
         └── src/
             ├── App.jsx
+            ├── context/
+            │   └── LanguageContext.jsx
+            ├── i18n/
+            │   └── translations.js
             ├── components/
             │   ├── Header.jsx
             │   ├── HeroSection.jsx
+            │   ├── TrustBanner.jsx
             │   ├── ForecastChart.jsx
             │   ├── HourlyTable.jsx
             │   ├── ComparePanel.jsx
-            │   ├── TrustBanner.jsx
-            │   └── ExplainerSection.jsx
+            │   ├── ExplainerSection.jsx
+            │   ├── Tabs.jsx
+            │   ├── CustomTooltip.jsx
+            │   ├── StatCard.jsx
+            │   └── FooterSignature.jsx
             └── utils/
                 ├── insights.js
                 └── formatters.js
@@ -163,13 +185,13 @@ alberta-electricity-predictor/
 
 ---
 
-## Setup
+## Local Setup
 ```bash
 # 1. Clone
 git clone https://github.com/jojoakoun/alberta-electricity-predictor.git
 cd alberta-electricity-predictor
 
-# 2. Python environment (Python 3.12 required — XGBoost incompatible with 3.14)
+# 2. Python environment (Python 3.12 required)
 python3.12 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
@@ -178,14 +200,16 @@ pip install -r requirements.txt
 cp .env.example .env
 # Edit .env with your AESO API key and PostgreSQL credentials
 
-# 4. Load data and train model
-python main.py update        # load data + build features
-# Then run notebooks/model.ipynb to train the model
+# 4. Load data
+python main.py update
 
-# 5. Start backend
+# 5. Train model
+# Run notebooks/model.ipynb
+
+# 6. Start backend
 uvicorn app.backend.main:app --reload --port 8000
 
-# 6. Start frontend
+# 7. Start frontend
 cd app/frontend
 npm install
 npm run dev
@@ -205,6 +229,31 @@ DB_PASSWORD=your_password
 
 ---
 
+## Deployment
+
+| Service | Platform | Cost |
+|---------|----------|------|
+| PostgreSQL | Railway | Free (1GB) |
+| FastAPI backend | Railway | Free (750h/month) |
+| React frontend | Railway | Free |
+| Hourly data scheduler | Railway cron | Free |
+
+---
+
+## Automated Updates
+
+The data pipeline runs automatically every hour on Railway :
+```
+Every hour → python main.py update
+           → fetch new AESO prices
+           → rebuild features
+           → /latest always returns fresh predictions
+```
+
+Model retraining : monthly, manually via `notebooks/model.ipynb`.
+
+---
+
 ## Key EDA Findings
 
 - **83%** of hours are below 100$/MWh — only **2%** are spikes above 300$
@@ -212,17 +261,6 @@ DB_PASSWORD=your_password
 - **AESO worst hours** : MAE ~40$/MWh at 17h–19h vs ~6$ at night
 - **AESO systematic bias** : overestimates on extreme events
 - **Spikes last multiple hours** — lag features are powerful signals
-
----
-
-## Deployment
-
-| Service | Platform | Cost |
-|---------|----------|------|
-| PostgreSQL | Railway | Free (1GB) |
-| FastAPI backend | Railway | Free (750h/month) |
-| React frontend | Vercel | Free |
-| Cron scheduler | Railway | Free |
 
 ---
 
@@ -235,8 +273,9 @@ DB_PASSWORD=your_password
 - [x] Optuna tuning + spike weighting
 - [x] Hybrid model — MAE 15.06$/MWh, beats AESO by 33.6%
 - [x] FastAPI backend — 4 endpoints
-- [x] React frontend — dashboard with chart, table, comparison
-- [ ] Production deployment
+- [x] React frontend — bilingual EN/FR dashboard
+- [x] Production deployment on Railway
+- [x] Mobile responsive
 - [ ] Automated hourly scheduler
 
 ---
