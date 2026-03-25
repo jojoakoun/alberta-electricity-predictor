@@ -14,14 +14,28 @@ import pandas as pd
 from fastapi import FastAPI, HTTPException
 from sqlalchemy import create_engine, text
 from dotenv import load_dotenv
+from fastapi.middleware.cors import CORSMiddleware
 
 load_dotenv()
+
+
 
 # ── App setup ─────────────────────────────────────────────────────────────────
 app = FastAPI(
   title       = "Alberta Electricity Price Predictor",
   description = "Predicts hourly pool prices — beats AESO by 30.4%",
   version     = "1.0.0",
+)
+
+# 🌐 CORS — allow React frontend to call the API
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins     = ["http://localhost:5173",
+                         "http://localhost:5174",
+                         "http://localhost:5175",
+                         "http://localhost:5176"],
+    allow_methods     = ["*"],
+    allow_headers     = ["*"],
 )
 
 # ── Database connection ────────────────────────────────────────────────────────
