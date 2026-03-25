@@ -45,7 +45,7 @@ export const translations = {
       eyebrow: "Alberta electricity guide",
       title: "Alberta Electricity Price Forecast",
       subtitle:
-        "This app compares our hourly forecast with the AESO forecast, the Alberta Electric System Operator, to help you spot the hours when electricity looks cheaper or more expensive.",
+        "In Alberta, electricity prices change every hour, from $5 at 3 a.m. to $1,000 during a cold winter evening. The AESO (Alberta Electric System Operator), the non-profit that manages the province's power grid for 4.3 million Albertans, publishes an official hourly forecast but it consistently misses the most expensive spikes. This app compares our AI forecast with the AESO's to help you spot the best hours to run your dryer, dishwasher, or charge your EV.",
       waitingForData: "Waiting for data",
       updatedAt: "Updated at",
     },
@@ -74,12 +74,12 @@ export const translations = {
       notEnoughDataWindow:
         "There is not enough data yet to identify a lower-cost window.",
       avgPriceHelper:
-        "Use this number as a simple guide. Hours above this level are more expensive than today’s average.",
+        "Use this number as a simple guide. Hours above this level are more expensive than today's average.",
       dateForecastCloser: "Our forecast was closer",
       dateAesoCloser: "AESO was closer",
       dateCompareHelperPrefix: "For",
       dateCompareHelperMiddle: "our average difference was",
-      dateCompareHelperAnd: "and AESO’s was",
+      dateCompareHelperAnd: "and AESO's was",
       dateCompareHelperSuffix: ".",
       perMwh: "$/MWh",
     },
@@ -107,8 +107,7 @@ export const translations = {
     table: {
       eyebrow: "Hourly guidance",
       title: "Electricity outlook hour by hour",
-      subtitle:
-        "This table shows the expected electricity conditions for",
+      subtitle: "This table shows the expected electricity conditions for",
       subtitleSuffix:
         ". It helps you quickly spot the best hours, the current view, and the more expensive periods.",
       goodTime: "Good time to use",
@@ -151,17 +150,17 @@ export const translations = {
     common: {
       refresh: "Actualiser la page",
       notAvailable: "Non disponible",
-      today: "Aujourd’hui",
+      today: "Aujourd'hui",
       selectedDate: "Date sélectionnée",
       currentHour: "Heure actuelle",
       startOfView: "Début de la plage affichée",
       highestPriceAround: "Prix le plus élevé vers",
       lowestAround: "Creux vers",
       highestAround: "Pic vers",
-      extendsNextMorning: "S’étend jusqu’au lendemain matin",
+      extendsNextMorning: "S'étend jusqu'au lendemain matin",
       finalPrice: "Prix final",
       ourForecast: "Notre prévision",
-      aesoForecast: "Prévision de l’AESO",
+      aesoForecast: "Prévision de l'AESO",
       ourPrice: "Notre prix",
       aesoPrice: "AESO",
       action: "Action",
@@ -170,19 +169,19 @@ export const translations = {
       overallResult: "Résultat global",
       overallAverageDifference: "Écart moyen global",
       ours: "Notre modèle",
-      hideExplanation: "Masquer l’explication",
+      hideExplanation: "Masquer l'explication",
       howToRead: "Comment lire cette page",
       notPublished: "Pas encore publié",
       loading: "Chargement des prévisions…",
       noDataForDate: "Aucune donnée disponible pour le",
-      goBackToday: "Revenir à aujourd’hui",
+      goBackToday: "Revenir à aujourd'hui",
       cannotConnect: "Impossible de joindre le serveur de prévision",
       serviceUnavailable:
         "Le service de prévision est temporairement indisponible.",
       somethingWentWrong:
         "Un problème est survenu. Veuillez actualiser la page et réessayer.",
       noFinalPricesYet:
-        "Aucun prix final du marché n’est encore disponible pour cette date.",
+        "Aucun prix final du marché n'est encore disponible pour cette date.",
       checkAgainLater:
         "Veuillez revenir plus tard, une fois les prix finaux du marché publiés.",
       now: "Maintenant",
@@ -191,10 +190,10 @@ export const translations = {
     },
 
     header: {
-      eyebrow: "Guide de l’électricité en Alberta",
-      title: "Prévision du prix de l’électricité en Alberta",
+      eyebrow: "Guide de l'électricité en Alberta",
+      title: "Prévision du prix de l'électricité en Alberta",
       subtitle:
-        "Cette application compare notre prévision horaire à celle de l’AESO, l’Alberta Electric System Operator, afin de vous aider à repérer les heures où l’électricité semble moins chère ou plus coûteuse.",
+        "En Alberta, le prix de l'électricité change chaque heure, de 5 $ à 3 h du matin à 1 000 $ lors d'une froide soirée d'hiver. L'AESO (Alberta Electric System Operator), l'organisme à but non lucratif qui gère le réseau électrique de la province pour 4,3 millions d'Albertains, publie une prévision officielle chaque heure mais elle rate souvent les pointes les plus coûteuses. Cette application compare notre prévision IA à celle de l'AESO pour vous aider à repérer les meilleures heures pour votre sécheuse, lave-vaisselle ou voiture électrique.",
       waitingForData: "En attente des données",
       updatedAt: "Mis à jour à",
     },
@@ -208,27 +207,27 @@ export const translations = {
     hero: {
       forecastFor: "Prévision pour",
       thisViewStartsAt: "Cette vue commence à",
-      bestTimeToUse: "Meilleur moment pour utiliser l’électricité",
-      averagePriceToday: "Prix moyen aujourd’hui",
+      bestTimeToUse: "Meilleur moment pour utiliser l'électricité",
+      averagePriceToday: "Prix moyen aujourd'hui",
       forecastResultForDate: "Bilan des prévisions pour cette date",
-      cheapestHourToday: "Heure la moins chère aujourd’hui",
-      mostExpensiveHourToday: "Heure la plus chère aujourd’hui",
+      cheapestHourToday: "Heure la moins chère aujourd'hui",
+      mostExpensiveHourToday: "Heure la plus chère aujourd'hui",
       thisLooksCheaper:
         "Cette plage horaire semble moins chère. Une utilisation flexible de 10 kWh pourrait vous faire économiser environ",
       ifMovedToBestHour: "si elle est déplacée vers la meilleure heure.",
       simpleView:
         "Cela vous donne une vue simple pour savoir si cette heure semble moins chère ou plus coûteuse que le reste de la journée.",
       bestWindowHelper:
-        "Cela semble être la meilleure fenêtre de 3 heures aujourd’hui pour la lessive, le lave-vaisselle, la cuisson ou la recharge d’un véhicule électrique.",
+        "Cela semble être la meilleure fenêtre de 3 heures aujourd'hui pour la lessive, le lave-vaisselle, la cuisson ou la recharge d'un véhicule électrique.",
       notEnoughDataWindow:
-        "Il n’y a pas encore assez de données pour repérer une plage moins coûteuse.",
+        "Il n'y a pas encore assez de données pour repérer une plage moins coûteuse.",
       avgPriceHelper:
-        "Utilisez ce chiffre comme repère simple. Les heures au-dessus de ce niveau sont plus chères que la moyenne d’aujourd’hui.",
+        "Utilisez ce chiffre comme repère simple. Les heures au-dessus de ce niveau sont plus chères que la moyenne d'aujourd'hui.",
       dateForecastCloser: "Notre prévision était plus proche",
-      dateAesoCloser: "L’AESO était plus proche",
+      dateAesoCloser: "L'AESO était plus proche",
       dateCompareHelperPrefix: "Pour le",
       dateCompareHelperMiddle: "notre écart moyen était de",
-      dateCompareHelperAnd: "et celui de l’AESO était de",
+      dateCompareHelperAnd: "et celui de l'AESO était de",
       dateCompareHelperSuffix: ".",
       perMwh: "$/MWh",
     },
@@ -239,9 +238,9 @@ export const translations = {
       summaryPrefix:
         "Ce résumé repose sur des résultats passés couvrant de nombreuses heures, et non uniquement sur le",
       oursBetter:
-        "Jusqu’à présent, notre prévision a généralement été plus proche du prix final du marché que celle de l’AESO.",
+        "Jusqu'à présent, notre prévision a généralement été plus proche du prix final du marché que celle de l'AESO.",
       aesoBetter:
-        "Jusqu’à présent, la prévision de l’AESO a généralement été plus proche du prix final du marché que la nôtre.",
+        "Jusqu'à présent, la prévision de l'AESO a généralement été plus proche du prix final du marché que la nôtre.",
       noBenchmarks:
         "Les données de référence globales ne sont pas encore disponibles.",
       avgDiffFromFinal: "Écart moyen par rapport au prix final",
@@ -249,16 +248,15 @@ export const translations = {
 
     chart: {
       eyebrow: "Guide quotidien",
-      title: "Prévision du prix de l’électricité pour le",
+      title: "Prévision du prix de l'électricité pour le",
       subtitle:
         "Utilisez ce graphique pour repérer rapidement les heures les moins chères et les pointes les plus coûteuses dans cette vue.",
     },
 
     table: {
       eyebrow: "Guide horaire",
-      title: "Prévision de l’électricité heure par heure",
-      subtitle:
-        "Ce tableau montre les conditions prévues de l’électricité pour le",
+      title: "Prévision de l'électricité heure par heure",
+      subtitle: "Ce tableau montre les conditions prévues de l'électricité pour le",
       subtitleSuffix:
         ". Il vous aide à repérer rapidement les meilleures heures, la plage actuellement affichée et les périodes plus coûteuses.",
       goodTime: "Bon moment pour utiliser",
@@ -271,29 +269,29 @@ export const translations = {
       eyebrow: "Vérification des prévisions",
       title: "Résultats des prévisions pour le",
       subtitle:
-        "Cette section compare notre prévision à celle de l’AESO uniquement pour les heures dont le prix final du marché est déjà connu.",
+        "Cette section compare notre prévision à celle de l'AESO uniquement pour les heures dont le prix final du marché est déjà connu.",
       oursCloser:
         "Pour les heures déjà complétées de cette date, notre prévision était globalement la plus proche.",
       aesoCloser:
-        "Pour les heures déjà complétées de cette date, la prévision de l’AESO était globalement la plus proche.",
+        "Pour les heures déjà complétées de cette date, la prévision de l'AESO était globalement la plus proche.",
       ourAverageDifference: "Notre écart moyen",
-      aesoAverageDifference: "Écart moyen de l’AESO",
+      aesoAverageDifference: "Écart moyen de l'AESO",
       overallResult: "Résultat global",
       ourCloser: "Notre prévision était la plus proche",
-      aesoCloserShort: "L’AESO était la plus proche",
+      aesoCloserShort: "L'AESO était la plus proche",
       offBy: "Écart de",
     },
 
     explainer: {
       whatMeans: "Ce que signifie ce prix",
       whatMeansBody:
-        "Il s’agit du prix de gros de l’électricité en Alberta pour une heure donnée. Il permet de voir quand les conditions semblent plus favorables ou plus coûteuses.",
+        "Il s'agit du prix de gros de l'électricité en Alberta pour une heure donnée. Il permet de voir quand les conditions semblent plus favorables ou plus coûteuses.",
       whyChanges: "Pourquoi le prix change",
       whyChangesBody:
-        "Le prix peut varier rapidement lorsque la demande augmente, que l’offre se resserre ou que le marché devient plus tendu.",
+        "Le prix peut varier rapidement lorsque la demande augmente, que l'offre se resserre ou que le marché devient plus tendu.",
       howHelps: "Comment cette page aide",
       howHelpsBody:
-        "Cette page aide à repérer de meilleures heures pour les usages flexibles du foyer, comme la lessive, le lave-vaisselle, la cuisson ou la recharge d’un véhicule électrique.",
+        "Cette page aide à repérer de meilleures heures pour les usages flexibles du foyer, comme la lessive, le lave-vaisselle, la cuisson ou la recharge d'un véhicule électrique.",
     },
   },
 }

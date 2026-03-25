@@ -38,9 +38,7 @@ export default function Header({
             className="mt-3 max-w-3xl text-[0.95rem] leading-7 text-slate-500"
             style={{ fontFamily: "var(--font-secondary)" }}
           >
-            {isFrench
-              ? "Cette application compare notre prévision horaire avec celle de l'AESO pour vous aider à repérer les heures moins chères ou plus coûteuses."
-              : "This app compares our hourly forecast with the AESO forecast to help you spot when electricity looks cheaper or more expensive."}
+            {t.header.subtitle}
           </p>
         </div>
       </div>
