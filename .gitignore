@@ -2,4 +2,5 @@
 venv/
 __pycache__/
 .DS_Store
-data/
+data/*
+!data/Hourly_Metered_Volumes_and_Pool_Price_and_AIL_2020-Jul2025.csv
