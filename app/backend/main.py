@@ -57,9 +57,20 @@ print("✅ Models loaded")
 # ── Hybrid prediction ─────────────────────────────────────────────────────────
 def predict_hybrid(X: pd.DataFrame) -> np.ndarray:
   """🔀 Route predictions to the right specialist."""
-  pred_v1    = model_v1.predict(X)
+  # 🔢 Force all feature columns to numeric for XGBoost
+  X = X.copy()
+  X = X.apply(pd.to_numeric, errors="coerce").astype(float)
+
+  print("📊 Feature dtypes:")
+  print(X.dtypes)
+
+  print("⚠️ Missing values per column:")
+  print(X.isnull().sum())
+
+  pred_v1 = model_v1.predict(X)
   pred_tuned = model_tuned.predict(X)
-  is_spike   = X["price_forecast"].values >= SPIKE_THRESHOLD
+  is_spike = X["price_forecast"].values >= SPIKE_THRESHOLD
+
   return np.where(is_spike, pred_tuned, pred_v1)
 
 
