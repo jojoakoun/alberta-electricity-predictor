@@ -103,7 +103,7 @@ def predict(date: str):
   df = df.set_index("timestamp_utc")
 
   # 🤖 Predict
-  X           = df[FEATURES]
+  X           = df[FEATURES].apply(pd.to_numeric, errors="coerce")
   predictions = predict_hybrid(X)
 
   # 📦 Format response
@@ -143,7 +143,7 @@ def latest():
   df = df.set_index("timestamp_utc")
   df = df.sort_index()
 
-  X = df[FEATURES]
+  X = df[FEATURES].apply(pd.to_numeric, errors="coerce")
   predictions = predict_hybrid(X)
 
   results = []
