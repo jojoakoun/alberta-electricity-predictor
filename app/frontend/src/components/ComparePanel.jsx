@@ -1,123 +1,168 @@
-import "../App.css"
+import {
+  formatMoney,
+  formatShortDate,
+  formatDateTimeLabel,
+} from "../utils/formatters"
+import { useLanguage } from "../context/LanguageContext"
+import { translations } from "../i18n/translations"
 
 export default function ComparePanel({
   withActual,
   ourMAE,
   aesoMAE,
-  formatMoney,
+  selectedDate,
 }) {
-  const ourModelIsBetter =
-    ourMAE != null && aesoMAE != null ? ourMAE <= aesoMAE : false
+  const { language } = useLanguage()
+  const t = translations[language]
 
-  const improvementPct =
-    ourMAE != null && aesoMAE != null && aesoMAE > 0
-      ? ((aesoMAE - ourMAE) / aesoMAE) * 100
-      : null
+  const readableDate = formatShortDate(selectedDate, language)
+
+  const hasComparison = ourMAE != null && aesoMAE != null
+  const ourModelIsBetter = hasComparison ? ourMAE <= aesoMAE : false
 
   return (
-    <section className="panel">
-      <div className="section-head section-head--with-copy">
-        <div>
-          <p className="eyebrow">Model check</p>
-          <h2>How our model compares with the AESO forecast</h2>
-          <p className="section-copy">
-            This section looks only at hours where the final market price is
-            already known. It shows whether our model or the AESO forecast was
-            closer to what actually happened.
-          </p>
+    <section className="mt-[18px] rounded-[24px] border border-slate-200 bg-white p-5 shadow-[0_10px_30px_rgba(15,23,42,0.08)] md:p-6">
+      <div className="mb-5">
+        <p className="mb-1 text-xs font-extrabold uppercase tracking-[0.12em] text-blue-600">
+          {t.compare.eyebrow}
+        </p>
 
-          {withActual.length > 0 && ourMAE != null && aesoMAE != null && (
-            <p className="section-copy" style={{ marginTop: "10px" }}>
-              {ourModelIsBetter ? (
-                <>
-                  On these completed hours, our model was generally{" "}
-                  <strong>closer to the real price</strong> than the AESO
-                  forecast.
-                  {improvementPct != null && (
-                    <>
-                      {" "}
-                      That is about <strong>{formatMoney(improvementPct)}%</strong>{" "}
-                      better on average.
-                    </>
-                  )}
-                </>
-              ) : (
-                <>
-                  On these completed hours, the <strong>AESO forecast</strong>{" "}
-                  was generally closer to the real price than our model.
-                </>
-              )}
-            </p>
-          )}
-        </div>
+        <h2
+          className="m-0 text-[1.32rem] leading-tight text-slate-900"
+          style={{ fontFamily: "var(--font-primary)" }}
+        >
+          {t.compare.title} {readableDate}
+        </h2>
+
+        <p className="mt-3 max-w-3xl text-[0.94rem] leading-7 text-slate-500">
+          {t.compare.subtitle}
+        </p>
+
+        {withActual.length > 0 && hasComparison && (
+          <p className="mt-2 max-w-3xl text-[0.94rem] leading-7 text-slate-500">
+            {ourModelIsBetter ? t.compare.oursCloser : t.compare.aesoCloser}
+          </p>
+        )}
       </div>
 
       {withActual.length === 0 ? (
-        <div className="empty-card">
-          <p>No final market prices are available yet for this selection.</p>
-          <span>
-            Come back later once the actual hourly prices have been published.
-          </span>
+        <div className="rounded-[18px] border border-slate-200 bg-slate-50 p-5 text-center">
+          <p className="mb-2 font-semibold text-slate-900">
+            {t.common.noFinalPricesYet}
+          </p>
+          <p className="text-slate-500">
+            {t.common.checkAgainLater}
+          </p>
         </div>
       ) : (
         <>
-          <div className="compare-summary">
-            <div className="compare-pill compare-pill--ours">
-              <span>Our average error</span>
-              <strong>{formatMoney(ourMAE)} $/MWh</strong>
+          <div className="mb-5 grid gap-3 md:grid-cols-3">
+            <div className="rounded-[18px] border border-blue-200 bg-blue-50 px-4 py-3">
+              <p className="text-[0.82rem] font-semibold text-slate-500">
+                {t.compare.ourAverageDifference}
+              </p>
+              <p className="mt-1 text-[1.08rem] font-extrabold text-slate-900">
+                {formatMoney(ourMAE)} $/MWh
+              </p>
             </div>
 
-            <div className="compare-pill compare-pill--aeso">
-              <span>AESO average error</span>
-              <strong>{formatMoney(aesoMAE)} $/MWh</strong>
+            <div className="rounded-[18px] border border-orange-200 bg-orange-50 px-4 py-3">
+              <p className="text-[0.82rem] font-semibold text-slate-500">
+                {t.compare.aesoAverageDifference}
+              </p>
+              <p className="mt-1 text-[1.08rem] font-extrabold text-slate-900">
+                {formatMoney(aesoMAE)} $/MWh
+              </p>
             </div>
 
             <div
               className={
                 ourModelIsBetter
-                  ? "compare-outcome compare-outcome--win"
-                  : "compare-outcome compare-outcome--loss"
+                  ? "rounded-[18px] border border-green-200 bg-green-50 px-4 py-3"
+                  : "rounded-[18px] border border-orange-200 bg-orange-50 px-4 py-3"
               }
             >
-              {ourModelIsBetter
-                ? "Our model was more accurate on this completed set."
-                : "AESO was more accurate on this completed set."}
+              <p className="text-[0.82rem] font-semibold text-slate-500">
+                {t.compare.overallResult}
+              </p>
+              <p
+                className={
+                  ourModelIsBetter
+                    ? "mt-1 text-[1.08rem] font-extrabold text-green-800"
+                    : "mt-1 text-[1.08rem] font-extrabold text-orange-800"
+                }
+              >
+                {ourModelIsBetter ? t.compare.ourCloser : t.compare.aesoCloserShort}
+              </p>
             </div>
           </div>
 
-          <div className="compare-list">
+          <div className="grid gap-3">
             {withActual.map((row) => {
               const ourError = Math.abs(row.prediction - row.price_actual)
               const aesoError = Math.abs(row.price_forecast - row.price_actual)
               const ourWin = ourError <= aesoError
 
               return (
-                <div key={row.hour_local} className="compare-row">
-                  <div className="compare-hour">{row.hour_local}:00</div>
+                <div
+                  key={row.hour_local}
+                  className="grid gap-3 rounded-[18px] border border-slate-200 bg-white p-4 md:grid-cols-[260px_minmax(160px,1fr)_160px_160px] md:items-center"
+                >
+                  <div>
+                    <p className="whitespace-nowrap text-[0.95rem] font-semibold leading-6 text-slate-900">
+                      {formatDateTimeLabel(selectedDate, row.hour_local, language)}
+                    </p>
+                  </div>
 
-                  <div className="compare-actual">
-                    Final price{" "}
-                    <strong>{formatMoney(row.price_actual)} $/MWh</strong>
+                  <div className="text-center md:pr-4">
+                    <p className="text-[0.74rem] font-semibold uppercase tracking-[0.05em] text-slate-500">
+                      {t.common.finalPrice}
+                    </p>
+                    <p className="mt-1 text-[1rem] font-extrabold text-slate-900">
+                      {formatMoney(row.price_actual)} $/MWh
+                    </p>
                   </div>
 
                   <div
                     className={
                       ourWin
-                        ? "compare-score compare-score--winner"
-                        : "compare-score"
+                        ? "rounded-[14px] border border-green-200 bg-green-50 px-3 py-2.5"
+                        : "rounded-[14px] border border-slate-200 bg-slate-50 px-3 py-2.5"
                     }
                   >
-                    Our model missed by {formatMoney(ourError, 1)}
+                    <p className="text-[0.75rem] font-semibold text-slate-500">
+                      {t.common.ourForecast}
+                    </p>
+                    <p
+                      className={
+                        ourWin
+                          ? "mt-1 text-[0.98rem] font-extrabold text-green-800"
+                          : "mt-1 text-[0.98rem] font-extrabold text-slate-800"
+                      }
+                    >
+                      {t.compare.offBy} {formatMoney(ourError, 1)}
+                    </p>
                   </div>
 
                   <div
                     className={
                       !ourWin
-                        ? "compare-score compare-score--winner"
-                        : "compare-score"
+                        ? "rounded-[14px] border border-green-200 bg-green-50 px-3 py-2.5"
+                        : "rounded-[14px] border border-slate-200 bg-slate-50 px-3 py-2.5"
                     }
                   >
-                    AESO missed by {formatMoney(aesoError, 1)}
+                    <p className="text-[0.75rem] font-semibold text-slate-500">
+                      {t.common.aesoForecast}
+                    </p>
+                    <p
+                      className={
+                        !ourWin
+                          ? "mt-1 text-[0.98rem] font-extrabold text-green-800"
+                          : "mt-1 text-[0.98rem] font-extrabold text-slate-800"
+                      }
+                    >
+                      {t.compare.offBy} {formatMoney(aesoError, 1)}
+                    </p>
                   </div>
                 </div>
               )
