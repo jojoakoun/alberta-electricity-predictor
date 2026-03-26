@@ -25,12 +25,21 @@ export default function HourlyTable({
 
   const readableDate = formatShortDate(selectedDate, language)
 
-  const cheapestHour = data.length
-    ? data.reduce((min, row) => row.prediction < min.prediction ? row : min, data[0])
+  // 🔄 Rotate array to start at current hour — preserves chronological order
+  const currentIndex = isToday
+    ? data.findIndex(row => row.hour_local === currentHour)
+    : -1
+
+  const sortedData = isToday && currentIndex >= 0
+    ? [...data.slice(currentIndex), ...data.slice(0, currentIndex)]
+    : data
+
+  const cheapestHour = sortedData.length
+    ? sortedData.reduce((min, row) => row.prediction < min.prediction ? row : min, sortedData[0])
     : null
 
-  const peakHour = data.length
-    ? data.reduce((max, row) => row.prediction > max.prediction ? row : max, data[0])
+  const peakHour = sortedData.length
+    ? sortedData.reduce((max, row) => row.prediction > max.prediction ? row : max, sortedData[0])
     : null
 
   return (
@@ -86,19 +95,19 @@ export default function HourlyTable({
           </thead>
 
           <tbody>
-            {data.map((row) => {
-              const rowLevel    = getLevel(row.prediction)
+            {sortedData.map((row) => {
+              const rowLevel     = getLevel(row.prediction)
               const isCurrentRow = isToday && row.hour_local === currentHour
-              const isBestRow   = cheapestHour && row.hour_local === cheapestHour.hour_local
-              const isPeakRow   = peakHour && row.hour_local === peakHour.hour_local
+              const isBestRow    = cheapestHour && row.hour_local === cheapestHour.hour_local
+              const isPeakRow    = peakHour && row.hour_local === peakHour.hour_local
 
               let rowBackground = ""
-              if (isCurrentRow) rowBackground = "bg-blue-50/70"
+              if (isCurrentRow)   rowBackground = "bg-blue-50/70"
               else if (isBestRow) rowBackground = "bg-green-50/70"
               else if (isPeakRow) rowBackground = "bg-rose-50/70"
 
               let rowLabel = ""
-              if (isCurrentRow)  rowLabel = t.common.now
+              if (isCurrentRow)   rowLabel = t.common.now
               else if (isBestRow) rowLabel = t.common.best
               else if (isPeakRow) rowLabel = t.common.highest
 
