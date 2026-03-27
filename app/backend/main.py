@@ -79,7 +79,7 @@ def health():
 def latest():
   """
   📊 Get today's hours in Edmonton time.
-  Falls back to last 24h if today is incomplete.
+  Falls back to last 24 sliding hours if today is incomplete.
   """
   # 🎯 Try today Edmonton first
   query_today = text("""
@@ -93,12 +93,13 @@ def latest():
   with engine.connect() as conn:
     df = pd.read_sql(query_today, conn)
 
-  # 🔁 Fallback — last 24 available hours
+  # 🔁 Fallback — last 24 hours only
   if len(df) < 6:
     query_fallback = text("""
       SELECT *
       FROM features
-      ORDER BY timestamp_utc DESC
+      WHERE timestamp_utc >= NOW() - INTERVAL '24 hours'
+      ORDER BY timestamp_utc ASC
       LIMIT 24
     """)
     with engine.connect() as conn:
@@ -149,7 +150,7 @@ def predict(date: str):
   if df.empty:
     raise HTTPException(
       status_code = 404,
-      detail      = f"No data found for date {date} — run 'python main.py update' first"
+      detail      = f"No data found for date {date}"
     )
 
   df["timestamp_utc"] = pd.to_datetime(df["timestamp_utc"], utc=True)
