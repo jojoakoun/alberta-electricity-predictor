@@ -148,20 +148,13 @@ class FeatureBuilder:
   
   def _drop_nan_rows(self, df: pd.DataFrame) -> pd.DataFrame:
     """
-    🗑️ Drop rows where critical lag features are NaN.
-    ⚠️  First 168 rows will have NaN in price_lag_168h.
+    🗑️ Drop only rows where 1h and 2h lags are NaN.
+    ⚠️  XGBoost handles all other NaN values natively.
     """
     before = len(df)
-    
-    # 🗑️ Drop only rows where lag features are NaN
-    lag_cols = ["price_lag_1h", "price_lag_2h",
-      "price_lag_24h", "price_lag_168h"]
-    
-    df = df.dropna(subset=lag_cols)
-
+    df = df.dropna(subset=["price_lag_1h", "price_lag_2h"])
     dropped = before - len(df)
     print(f"   🗑️  Dropped {dropped:,} rows with NaN lags")
-
     return df
 
   

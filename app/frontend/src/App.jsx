@@ -18,6 +18,20 @@ import { useLanguage } from "./context/LanguageContext"
 
 const API_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000"
 
+// 🕐 Get today's date in Edmonton timezone
+function getEdmontonToday() {
+  return new Date(
+    new Date().toLocaleString("en-US", { timeZone: "America/Edmonton" })
+  ).toLocaleDateString("en-CA")
+}
+
+// 🕐 Get current hour in Edmonton timezone
+function getEdmontonHour() {
+  return new Date(
+    new Date().toLocaleString("en-US", { timeZone: "America/Edmonton" })
+  ).getHours()
+}
+
 export default function App() {
   const { language } = useLanguage()
 
@@ -28,15 +42,13 @@ export default function App() {
   const [lastUpdate, setLastUpdate] = useState(null)
   const [activeTab, setActiveTab] = useState("chart")
   const [showExplainer, setShowExplainer] = useState(false)
-  const [selectedDate, setSelectedDate] = useState(
-    new Date().toISOString().split("T")[0],
-  )
+  const [selectedDate, setSelectedDate] = useState(getEdmontonToday)
 
   const fetchData = useCallback(async (date) => {
     try {
       setError(null)
 
-      const today = new Date().toISOString().split("T")[0]
+      const today = getEdmontonToday()
       const isTodayRequest = date === today
 
       const [dataRes, healthRes, infoRes] = await Promise.all([
@@ -67,7 +79,6 @@ export default function App() {
       } else {
         setError("unknown")
       }
-
       setData([])
     } finally {
       setLoading(false)
@@ -84,11 +95,9 @@ export default function App() {
     return () => clearInterval(interval)
   }, [selectedDate, fetchData])
 
-  const today = new Date().toISOString().split("T")[0]
+  const today = getEdmontonToday()
   const isToday = selectedDate === today
-  const currentHour = new Date(
-    new Date().toLocaleString("en-US", { timeZone: "America/Edmonton" }),
-  ).getHours()
+  const currentHour = getEdmontonHour()
 
   const insights = useMemo(() => {
     if (!data.length) {
@@ -180,7 +189,7 @@ export default function App() {
     potentialSaving,
   } = insights
 
-  const benchmarkOurMae = health?.mae_overall ?? ourMAE
+  const benchmarkOurMae  = health?.mae_overall ?? ourMAE
   const benchmarkAesoMae = health?.mae_aeso_overall ?? aesoMAE
 
   const handleRefresh = () => {
@@ -219,14 +228,7 @@ export default function App() {
             }}
           >
             <p style={{ fontSize: 36, margin: "0 0 10px" }}>🔌</p>
-            <p
-              style={{
-                color: "#dc2626",
-                fontWeight: 700,
-                fontSize: 15,
-                margin: "0 0 6px",
-              }}
-            >
+            <p style={{ color: "#dc2626", fontWeight: 700, fontSize: 15, margin: "0 0 6px" }}>
               Cannot connect to the prediction server
             </p>
             <p style={{ color: "#6b7280", fontSize: 13, margin: 0 }}>
@@ -247,20 +249,11 @@ export default function App() {
             }}
           >
             <p style={{ fontSize: 36, margin: "0 0 10px" }}>📅</p>
-            <p
-              style={{
-                color: "#92400e",
-                fontWeight: 700,
-                fontSize: 15,
-                margin: "0 0 8px",
-              }}
-            >
+            <p style={{ color: "#92400e", fontWeight: 700, fontSize: 15, margin: "0 0 8px" }}>
               No data available for {selectedDate}
             </p>
             <p style={{ color: "#6b7280", fontSize: 13, margin: "0 0 20px" }}>
-              We only have predictions for dates that have already been
-              processed. Future dates and dates before January 2020 are not
-              available yet.
+              We only have predictions for dates that have already been processed.
             </p>
             <button
               onClick={() => setSelectedDate(today)}
@@ -286,7 +279,9 @@ export default function App() {
           </div>
         )}
 
-        {loading && <div className="loading-state">Loading predictions…</div>}
+        {loading && (
+          <div className="loading-state">Loading predictions…</div>
+        )}
 
         {!loading && !error && level && current && (
           <>

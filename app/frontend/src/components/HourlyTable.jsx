@@ -25,21 +25,47 @@ export default function HourlyTable({
 
   const readableDate = formatShortDate(selectedDate, language)
 
-  // 🔄 Rotate array to start at current hour — preserves chronological order
+  // 🧹 Step 1 — Deduplicate by hour_local, keep last occurrence (most recent)
+  const uniqueData = Array.from(
+    data.reduce((map, row) => {
+      map.set(Number(row.hour_local), row)
+      return map
+    }, new Map()).values()
+  )
+
+  // 📅 Step 2 — Sort chronologically by hour_local (0 → 23)
+  const chronologicalData = [...uniqueData].sort(
+    (a, b) => Number(a.hour_local) - Number(b.hour_local)
+  )
+
+  // 🔄 Step 3 — Rotate so current hour is first
   const currentIndex = isToday
-    ? data.findIndex(row => row.hour_local === currentHour)
+    ? chronologicalData.findIndex(
+        row => Number(row.hour_local) === Number(currentHour)
+      )
     : -1
 
-  const sortedData = isToday && currentIndex >= 0
-    ? [...data.slice(currentIndex), ...data.slice(0, currentIndex)]
-    : data
+  const sortedData =
+    isToday && currentIndex >= 0
+      ? [
+          ...chronologicalData.slice(currentIndex),
+          ...chronologicalData.slice(0, currentIndex),
+        ]
+      : chronologicalData
 
+  // 🎯 Find cheapest and peak from sorted data
   const cheapestHour = sortedData.length
-    ? sortedData.reduce((min, row) => row.prediction < min.prediction ? row : min, sortedData[0])
+    ? sortedData.reduce(
+        (min, row) => (row.prediction < min.prediction ? row : min),
+        sortedData[0]
+      )
     : null
 
   const peakHour = sortedData.length
-    ? sortedData.reduce((max, row) => row.prediction > max.prediction ? row : max, sortedData[0])
+    ? sortedData.reduce(
+        (max, row) => (row.prediction > max.prediction ? row : max),
+        sortedData[0]
+      )
     : null
 
   return (
@@ -97,19 +123,25 @@ export default function HourlyTable({
           <tbody>
             {sortedData.map((row) => {
               const rowLevel     = getLevel(row.prediction)
-              const isCurrentRow = isToday && row.hour_local === currentHour
-              const isBestRow    = cheapestHour && row.hour_local === cheapestHour.hour_local
-              const isPeakRow    = peakHour && row.hour_local === peakHour.hour_local
+              const isCurrentRow =
+                isToday &&
+                Number(row.hour_local) === Number(currentHour)
+              const isBestRow =
+                cheapestHour &&
+                Number(row.hour_local) === Number(cheapestHour.hour_local)
+              const isPeakRow =
+                peakHour &&
+                Number(row.hour_local) === Number(peakHour.hour_local)
 
               let rowBackground = ""
-              if (isCurrentRow)   rowBackground = "bg-blue-50/70"
-              else if (isBestRow) rowBackground = "bg-green-50/70"
-              else if (isPeakRow) rowBackground = "bg-rose-50/70"
+              if (isCurrentRow)        rowBackground = "bg-blue-50/70"
+              else if (isBestRow)      rowBackground = "bg-green-50/70"
+              else if (isPeakRow)      rowBackground = "bg-rose-50/70"
 
               let rowLabel = ""
-              if (isCurrentRow)   rowLabel = t.common.now
-              else if (isBestRow) rowLabel = t.common.best
-              else if (isPeakRow) rowLabel = t.common.highest
+              if (isCurrentRow)        rowLabel = t.common.now
+              else if (isBestRow)      rowLabel = t.common.best
+              else if (isPeakRow)      rowLabel = t.common.highest
 
               return (
                 <tr
@@ -120,7 +152,12 @@ export default function HourlyTable({
                   <td className="border-b border-slate-100 px-4 py-4 align-middle">
                     <div className="flex flex-col gap-1">
                       <span className="whitespace-nowrap text-[0.96rem] font-medium text-slate-900">
-                        {formatDateTimeLabel(selectedDate, row.hour_local, language)}
+                        {formatDateTimeLabel(
+                          selectedDate,
+                          row.hour_local,
+                          language,
+                          row.timestamp_utc
+                        )}
                       </span>
                       {rowLabel && (
                         <span

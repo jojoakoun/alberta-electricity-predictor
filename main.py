@@ -45,7 +45,13 @@ def fetch_api():
   api_client = AESOClient()
   end_date   = date.today().strftime("%Y-%m-%d")
   start_date = db.get_latest_timestamp()
-  df         = api_client.fetch(start_date, end_date)
+
+  # ✅ Skip if already up to date
+  if start_date > end_date:
+    print(f"✅ Already up to date — skipping API fetch ({start_date} > {end_date})")
+    return
+
+  df = api_client.fetch(start_date, end_date)
   db.insert_dataframe(df, source="api")
 
 
@@ -57,7 +63,7 @@ def build_features():
   builder = FeatureBuilder()
 
   # 📅 Find start date with 168h context
-  start_date = db.get_latest_feature_timestamp()
+  start_date = None
 
   # 📥 Load from PostgreSQL via SQLAlchemy
   engine = create_engine(

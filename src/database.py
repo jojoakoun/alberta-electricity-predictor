@@ -240,7 +240,28 @@ class DatabaseClient:
         %s, %s, %s, %s,
         %s, %s, %s, %s, %s, %s
       )
-      ON CONFLICT (timestamp_utc) DO NOTHING;
+      ON CONFLICT (timestamp_utc) DO UPDATE SET
+        price_actual       = EXCLUDED.price_actual,
+        price_forecast     = EXCLUDED.price_forecast,
+        consumption_actual = EXCLUDED.consumption_actual,
+        hour_local         = EXCLUDED.hour_local,
+        month              = EXCLUDED.month,
+        day_of_week        = EXCLUDED.day_of_week,
+        is_weekend         = EXCLUDED.is_weekend,
+        price_lag_1h       = EXCLUDED.price_lag_1h,
+        price_lag_2h       = EXCLUDED.price_lag_2h,
+        price_lag_24h      = EXCLUDED.price_lag_24h,
+        price_lag_168h     = EXCLUDED.price_lag_168h,
+        price_rolling_24h  = EXCLUDED.price_rolling_24h,
+        price_rolling_7d   = EXCLUDED.price_rolling_7d,
+        price_rolling_30d  = EXCLUDED.price_rolling_30d,
+        total_generation_mw = EXCLUDED.total_generation_mw,
+        export_to_bc       = EXCLUDED.export_to_bc,
+        export_to_mt       = EXCLUDED.export_to_mt,
+        export_to_sk       = EXCLUDED.export_to_sk,
+        import_from_bc     = EXCLUDED.import_from_bc,
+        import_from_mt     = EXCLUDED.import_from_mt,
+        import_from_sk     = EXCLUDED.import_from_sk;
     """
 
     rows = [
